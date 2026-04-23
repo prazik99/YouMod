@@ -1,6 +1,6 @@
 "NEW_ISSUES" = "Report issues or request new features";
 "NEW_ISSUES_DESC" = "Found bugs or want to request new features? Tap here.";
-"SOURCE_CODES" = "Sources codes";
+"SOURCE_CODES" = "Source codes";
 "SOURCE_CODES_DESC" = "Take a look at the codes!";
 
 "NAVBAR" = "Navigation bar";
@@ -14,23 +14,56 @@
 "HIDE_SEARCH_BUTTON_DESC" = "Hide search button from the navigation bar.";
 "HIDE_VOICE_SEARCH_BUTTON" = "Hide voice search button";
 "HIDE_VOICE_SEARCH_BUTTON_DESC" = "Hide voice search button from the navigation bar.";
-"HIDE_CAST_BUTTON" = "Hide cast button";
-"HIDE_CAST_BUTTON_DESC" = "Hide cast button from the navigation bar.";
+"HIDE_CAST_BUTTON_NAVBAR" = "Hide cast button";
+"HIDE_CAST_BUTTON_NAVBAR_DESC" = "Hide cast button from the navigation bar.";
 
 "FEED" = "Feed";
 "HIDE_SUBBAR" = "Hide subbar";
 "HIDE_SUBBAR_DESC" = "Hide subbar at the top of the feed.";
-"HIDE_MIX_PLAYLISTS" = "Hide mix playlists";
-"HIDE_MIX_PLAYLISTS_DESC" = "Hide mix playlists from the feed.";
-"HIDE_HORIZONAL_SHELF" = "Hide horizontal shelf";
-"HIDE_HORIZONAL_SHELF_DESC" = "Hide horizontal shelf (eg. Continue watching, Listen again, Breaking news) from the feed.";
+"HIDE_HORIZONTAL_SHELF" = "Hide horizontal shelf";
+"HIDE_HORIZONTAL_SHELF_DESC" = "Hide horizontal shelf (eg. Continue watching, Listen again, Breaking news) from the feed.\nNOTE: This may leave a blank box in the feed.";
 "HIDE_MUSIC_PLAYLISTS" = "Hide music playlist generator";
-"HIDE_MUSIC_PLAYLISTS_DESC" = "Hide music playlist generator (Select music tunes from three) from the feed.";
+"HIDE_MUSIC_PLAYLISTS_DESC" = "Hide music playlist generator (Select music tunes from three) from the feed.\nNOTE: This may leave a blank box in the feed.";
 "HIDE_SHORTS_SHELF" = "Hide Shorts shelf";
-"HIDE_SHORTS_SHELF_DESC" = "Hide Shorts shelf from the feed.";
+"HIDE_SHORTS_SHELF_DESC" = "Hide Shorts shelf from the feed, including in Subscriptions tab.";
 
 "PLAYER" = "Player";
-
+"HIDE_AUTOPLAY" = "Hide autoplay switch";
+"HIDE_AUTOPLAY_DESC" = "Hide autoplay switch from the video overlay.";
+"HIDE_CAPTIONS_BUTTON" = "Hide captions button";
+"HIDE_CAPTIONS_BUTTON_DESC" = "Hide captions button from the video overlay.";
+"HIDE_CAST_BUTTON_PLAYER" = "Hide cast button";
+"HIDE_CAST_BUTTON_PLAYER_DESC" = "Hide cast button from the video overlay.\nNOTE: This may leave a blank box at the top of the video overlay.";
+"HIDE_PREV_BUTTON" = "Hide previous/back button";
+"HIDE_PREV_BUTTON_DESC" = "Hide previous/back button from the video overlay.";
+"HIDE_NEXT_BUTTON" = "Hide next/skip button";
+"HIDE_NEXT_BUTTON_DESC" = "Hide next/skip button from the video overlay.";
+"REMOVE_DARK_OVERLAY" = "Remove dark overlay";
+"REMOVE_DARK_OVERLAY_DESC" = "Remove dark overlay from the video overlay.";
+"HIDE_END_SCREEN" = "Hide endscreen cards";
+"HIDE_END_SCREEN_DESC" = "Hide endscreen cards shown before the video ends.";
+"HIDE_WATERMARK" = "Hide watermark";
+"HIDE_WATERMARK_DESC" = "Hide channel watermark at the bottom of the video overlay.";
+"DISABLES_DOUBLE_TAP" = "Disables double tap";
+"DISABLES_DOUBLE_TAP_DESC" = "Disables double tap to seek in the video overlay.";
+"DISABLES_LONG_HOLD" = "Disables long hold";
+"DISABLES_LONG_HOLD_DESC" = "Disables long hold to speed up the video in the video overlay.";
+"AUTO_EXIT_FULLSCREEN" = "Auto exit fullscreen";
+"AUTO_EXIT_FULLSCREEN_DESC" = "Automatically exit fullscreen after the video ends.";
+"HIDE_LIKE_BUTTON" = "Hide Like button";
+"HIDE_LIKE_BUTTON_DESC" = "Hide Like button from the action bar under the video overlay.";
+"HIDE_DISLIKE_BUTTON" = "Hide Dislike button";
+"HIDE_DISLIKE_BUTTON_DESC" = "Hide Dislike button from the action bar under the video overlay.";
+"HIDE_SHARE_BUTTON" = "Hide Share button";
+"HIDE_SHARE_BUTTON_DESC" = "Hide Share button from the action bar under the video overlay.";
+"HIDE_DOWNLOAD_BUTTON" = "Hide Download button";
+"HIDE_DOWNLOAD_BUTTON_DESC" = "Hide Download button from the action bar under the video overlay.";
+"HIDE_CLIP_BUTTON" = "Hide Clip button";
+"HIDE_CLIP_BUTTON_DESC" = "Hide Clip button from the action bar under the video overlay.";
+"HIDE_REMIX_BUTTON" = "Hide Remix button";
+"HIDE_REMIX_BUTTON_DESC" = "Hide Remix button from the action bar under the video overlay.";
+"HIDE_SAVE_BUTTON" = "Hide Save button";
+"HIDE_SAVE_BUTTON_DESC" = "Hide Save button from the action bar under the video overlay.";
 
 "TABBAR" = "Tab bar";
 "HIDE_TAB_INDI" = "Hide tab indicators";

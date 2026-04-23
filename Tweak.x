@@ -49,7 +49,7 @@
     if (IS_ENABLED(HideSearch)) self.searchButton.hidden = YES;
     for (UIView *subview in self.subviews) {
         if (IS_ENABLED(HideVoiceSearch) && [subview.accessibilityLabel isEqualToString:NSLocalizedString(@"search.voice.access", nil)]) subview.hidden = YES;
-        if (IS_ENABLED(HideCast) && [subview.accessibilityIdentifier isEqualToString:@"id.mdx.playbackroute.button"]) subview.hidden = YES;
+        if (IS_ENABLED(HideCastButtonNav) && [subview.accessibilityIdentifier isEqualToString:@"id.mdx.playbackroute.button"]) subview.hidden = YES;
     }
 }
 %end
@@ -105,36 +105,29 @@
 }
 %end
 
-/*
 %hook YTIElementRenderer
 - (NSData *)elementData {
     NSString *description = [self description];
-    NSLog(@"[YouMod Debug] Description from Renderer is: %s", [description UTF8String]);
-    // Try all
-    NSDictionary *filters = @{
-        @"horizontal-video-shelf": @(IS_ENABLED(HideHoriShelf)),
-        @"feed_nudge": @(IS_ENABLED(HideGenMusicShelf)),
-        @"vwc": @(IS_ENABLED(HideMixPlayLists)),
-        @"shorts_shelf": @(IS_ENABLED(HideShortsShelf)),
-        @"shorts_video_cell": @(IS_ENABLED(HideShortsShelf)),
-        @"6Shorts": @(IS_ENABLED(HideShortsShelf))
-    };
-    // Loop through the dictionary
-    for (NSString *key in filters) {
-        BOOL isEnabled = [filters[key] boolValue];
-        if (isEnabled && [description containsString:key]) {
-            // Special exception for Shorts
-            if ([key containsString:@"shorts"] && [description containsString:@"history*"]) {
-                return %orig;
-            } else {
-                return [NSData data];
-            }
+    NSArray *shortsToRemove = @[@"shorts_shelf.eml", @"shorts_video_cell.eml", @"6Shorts", @"eml.shorts-shelf"];
+    for (NSString *shorts in shortsToRemove) {
+        if (IS_ENABLED(HideShortsShelf) && [description containsString:shorts] && ![description containsString:@"history*"]) {
+            return nil;
         }
     }
     return %orig;
 }
 %end
-*/
+
+// I ran out of ideas
+%hook _ASDisplayView
+
+- (void)didMoveToWindow {
+    %orig;
+    if (IS_ENABLED(HideHoriShelf) && [self.accessibilityIdentifier isEqualToString:@"horizontal-video-shelf.view"]) self.hidden = YES;
+	if (IS_ENABLED(HideGenMusicShelf) && [self.accessibilityIdentifier isEqualToString:@"feed_nudge.view"]) self.hidden = YES;
+}
+
+%end
 
 %hook YTSearchViewController
 - (void)viewDidLoad {
@@ -152,46 +145,36 @@
 %end
 */
 
+/*
+// Disable Fullscreen Actions
+%hook YTFullscreenActionsView
+- (BOOL)enabled { return ytlBool(@"noFullscreenActions") ? NO : YES; }
+- (void)setEnabled:(BOOL)arg1 { ytlBool(@"noFullscreenActions") ? %orig(NO) : %orig; }
+%end
+
+// Dont Show Related Videos on Finish
+%hook YTFullscreenEngagementOverlayController
+- (void)setRelatedVideosVisible:(BOOL)arg1 { ytlBool(@"noRelatedVids") ? %orig(NO) : %orig; }
+%end
+*/
+
 %hook YTMainAppControlsOverlayView
-// Hide Autoplay Switch
-- (void)setAutoplaySwitchButtonRenderer:(id)arg1 {}
+// Hide autoplay Switch
+- (void)setAutoplaySwitchButtonRenderer:(id)arg1 { if (!IS_ENABLED(HideAutoPlayToggle)) %orig; }
+// Hide captions Button
+- (void)setClosedCaptionsOrSubtitlesButtonAvailable:(BOOL)arg1 { if (!IS_ENABLED(HideCaptionsButton)) %orig; }
+// Hide cast button
+- (id)playbackRouteButton { return IS_ENABLED(HideCastButtonPlayer) ? nil : %orig; }
+- (void)setPreviousButtonHidden:(BOOL)arg { if (!IS_ENABLED(HidePrevButton)) %orig; }
+- (void)setNextButtonHidden:(BOOL)arg { if (!IS_ENABLED(HideNextButton)) %orig; }
 
-// Hide Subs Button
-- (void)setClosedCaptionsOrSubtitlesButtonAvailable:(BOOL)arg1 { %orig(NO); }
-// - (void)setCaptionsEnabled:(BOOL)arg
-// - (void)setVoiceOverEnabled:(BOOL)arg1
-
-// Hide YouTube Music button
-- (void)setYoutubeMusicButton:(id)arg1 {}
-
-// TEST - Hide cast button
-- (id)playbackRouteButton { return nil; }
-// - (void)setPreviousButtonHidden:(BOOL)arg
-// - (void)setNextButtonHidden:(BOOL)arg
-/* 
-- (void)setShareButtonAvailable:(BOOL)arg1 {
-    if (IS_ENABLED(kEnableShareButton)) {
-        %orig(YES);
-    } else {
-        %orig(NO);
-    }
-}
-
-- (void)setAddToButtonAvailable:(BOOL)arg1 {
-    if (IS_ENABLED(kEnableSaveToButton)) {
-        %orig(YES);
-    } else {
-        %orig(NO);
-    }
-}
-
+// TEST
 - (BOOL)titleViewHidden {
-    return IS_ENABLED(@"hideVideoTitle_enabled") ? YES : %orig;
+    return YES;
 }
 
-%hook YTMainAppControlsOverlayView
 - (void)layoutSubviews {
-	%orig();
+	%orig;
     MSHookIvar<YTTransportControlsButtonView *>(self, "_previousButtonView").backgroundColor = nil;
     MSHookIvar<YTTransportControlsButtonView *>(self, "_nextButtonView").backgroundColor = nil;
     MSHookIvar<YTTransportControlsButtonView *>(self, "_seekBackwardAccessibilityButtonView").backgroundColor = nil;
@@ -202,9 +185,43 @@
 
 %hook YTColdConfig
 - (BOOL)isLandscapeEngagementPanelEnabled {
-    return IS_ENABLED(kHideRightPanel) ? NO : %orig;
+    return NO;
 }
 %end
+
+// Remove Dark Background in Overlay
+%hook YTMainAppVideoPlayerOverlayView
+- (void)setBackgroundVisible:(BOOL)arg1 isGradientBackground:(BOOL)arg2 { IS_ENABLED(RemoveDarkOverlay) ? %orig(NO, arg2) : %orig; }
+// Hide Watermarks
+- (BOOL)isWatermarkEnabled { return IS_ENABLED(HideWaterMark) ? NO : %orig; }
+- (void)setWatermarkEnabled:(BOOL)arg { IS_ENABLED(HideWaterMark) ? %orig(NO) : %orig; }
+- (id)playbackRouteButton { return IS_ENABLED(HideCastButtonPlayer) ? nil : %orig; }
+%end
+
+// No Endscreen Cards
+%hook YTCreatorEndscreenView
+- (void)setHidden:(BOOL)arg1 { IS_ENABLED(HideEndScreenCards) ? %orig(YES) : %orig; }
+- (void)setHoverCardHidden:(BOOL)arg { IS_ENABLED(HideEndScreenCards) ? %orig(YES) : %orig; }
+- (void)setHoverCardRenderer:(id)arg { if (!IS_ENABLED(HideEndScreenCards)) %orig; }
+%end
+
+%hook YTMainAppVideoPlayerOverlayViewController
+// Disable Double Tap To Seek
+- (BOOL)allowDoubleTapToSeekGestureRecognizer { return IS_ENABLED(DisablesDoubleTap) ? NO : %orig; }
+// Disable long hold
+- (BOOL)allowLongPressGestureRecognizerInView:(id)arg { return IS_ENABLED(DisablesLongHold) ? NO : %orig; }
+%end
+
+// Remove Watermarks
+%hook YTAnnotationsViewController
+- (void)loadFeaturedChannelWatermark { if (!IS_ENABLED(HideWaterMark)) %orig; }
+%end
+
+// Exit Fullscreen on Finish
+%hook YTWatchFlowController
+- (BOOL)shouldExitFullScreenOnFinish { return IS_ENABLED(AutoExitFullScreen) ? YES : %orig; }
+%end
+
 
 %hook YTHotConfig
 - (BOOL)enableOmitAdvancedMenuInShortsVideoQualityPicker { return YES; }
@@ -241,7 +258,7 @@
 
 %hook YTColdConfig
 - (BOOL)mainAppCoreClientIosEnableStartupAnimation {  // Works!
-    return IS_ENABLED(kYTStartupAnimation) ? YES : NO;
+    return NO;
 }
 %end
 
@@ -249,6 +266,7 @@
 - (BOOL)stickyNavHeaderEnabled { return YES; } 
 %end
 
+/*
 %hook YTColdConfig
 - (BOOL)removeNextPaddleForAllVideos { 
     return YES; 
@@ -257,37 +275,18 @@
     return YES; 
 }
 %end
-
-// Hide Shorts Cells - for uYou 3.0.4+ (PoomSmart/YTUnShorts)
-%hook YTIElementRenderer
-- (NSData *)elementData {
-    // Check if hideShortsCells is enabled
-    if ([[NSUserDefaults standardUserDefaults] boolForKey:@"hideShortsCells"]) {
-        NSString *description = [self description];
-        
-        BOOL hasShorts = ([description containsString:@"shorts_shelf"] || [description containsString:@"shorts_video_cell"] || [description containsString:@"shorts_grid_shelf_footer"] || [description containsString:@"youtube_shorts_24"]);
-        BOOL hasShortsInHistory = [description containsString:@"compact_video.eml"] && [description containsString:@"youtube_shorts_"];
-
-        if (hasShorts || hasShortsInHistory) {
-            return [NSData data];
-        }
-    }
-    return %orig;
-}
-%end
+*/
 
 // Always use remaining time in the video player - @bhackel
 %hook YTPlayerBarController
 // When a new video is played, enable time remaining flag
 - (void)setActiveSingleVideo:(id)arg1 {
     %orig;
-    if (IS_ENABLED(@"alwaysShowRemainingTime_enabled")) {
-        // Get the player bar view
-        YTInlinePlayerBarContainerView *playerBar = self.playerBar;
-        if (playerBar) {
-            // Enable the time remaining flag
-            playerBar.shouldDisplayTimeRemaining = YES;
-        }
+    // Get the player bar view
+    YTInlinePlayerBarContainerView *playerBar = self.playerBar;
+    if (playerBar) {
+        // Enable the time remaining flag
+        playerBar.shouldDisplayTimeRemaining = YES;
     }
 }
 %end
@@ -295,19 +294,14 @@
 // Disable toggle time remaining - @bhackel
 %hook YTInlinePlayerBarContainerView
 - (void)setShouldDisplayTimeRemaining:(BOOL)arg1 {
-    if (IS_ENABLED(@"disableRemainingTime_enabled")) {
-        // Set true if alwaysShowRemainingTime
-        if (IS_ENABLED(@"alwaysShowRemainingTime_enabled")) {
-            %orig(YES);
-        } else {
-            %orig(NO);
-        }
-        return;
+    // Set true if alwaysShowRemainingTime
+    if (IS_ENABLED(@"alwaysShowRemainingTime_enabled")) {
+        %orig(YES);
+    } else {
+        %orig(NO);
     }
     %orig;
 }
-%end
-*/
 %end
 
 // อื่นๆ
@@ -386,19 +380,6 @@
 %end
 */
 
-// Remove Dark Background in Overlay
-%hook YTMainAppVideoPlayerOverlayView
-- (void)setBackgroundVisible:(BOOL)arg1 isGradientBackground:(BOOL)arg2 { %orig(NO, arg2); }
-%end
-
-// No Endscreen Cards
-%hook YTCreatorEndscreenView
-- (void)setHidden:(BOOL)arg1 { %orig(YES); }
-- (void)setHoverCardHidden:(BOOL)arg { %orig(YES); }
-- (void)setHoverCardRenderer:(id)arg {}
-%end
-
-/*
 // Disable Fullscreen Actions
 %hook YTFullscreenActionsView
 - (BOOL)enabled { return NO; }
@@ -410,17 +391,6 @@
 - (void)setPlayerBarAlpha:(CGFloat)alpha { %orig(1.0); } // Force seek bar i guess
 %end
 */
-
-// Remove Watermarks
-%hook YTAnnotationsViewController
-- (void)loadFeaturedChannelWatermark {}
-%end
-
-%hook YTMainAppVideoPlayerOverlayView
-- (BOOL)isWatermarkEnabled { return NO; }
-- (void)setWatermarkEnabled:(BOOL)arg { %orig(NO); }
-- (id)playbackRouteButton { return nil; }
-%end
 
 /*
 // Forcibly Enable Miniplayer
@@ -455,6 +425,10 @@
 // Dont Show Related Videos on Finish
 %hook YTFullscreenEngagementOverlayController
 - (void)setRelatedVideosVisible:(BOOL)arg1 { %orig(NO); }
+%end
+
+%hook YTFullscreenEngagementOverlayView
+- (void)setRelatedVideosView:(id)arg {}
 %end
 
 // Disable Snap To Chapter (https://github.com/qnblackcat/uYouPlus/blob/main/uYouPlus.xm#L457-464)
@@ -555,20 +529,6 @@
 }
 %end
 
-// Exit Fullscreen on Finish
-%hook YTWatchFlowController
-- (BOOL)shouldExitFullScreenOnFinish { return YES; }
-%end
-
-%hook YTMainAppVideoPlayerOverlayViewController
-// Disable Double Tap To Seek
-- (BOOL)allowDoubleTapToSeekGestureRecognizer { return NO; }
-// Disable long hold
-- (BOOL)allowLongPressGestureRecognizerInView:(id)arg { return NO; }
-// Disable Two Finger Double Tap
-- (BOOL)allowTwoFingerDoubleTapGestureRecognizer { return NO; }
-%end
-
 /*
 // Remove Download button from the menu
 %hook YTDefaultSheetController
@@ -652,7 +612,6 @@ BOOL isTabSelected = NO;
 %end
 */
 
-/*
 // Thanks to aricloverEXTRA for all of these logics!
 // YTHidePlayerButtons 1.0.0 - made by @aricloverEXTRA
 static NSDictionary<NSString *, NSString *> *HideToggleMap(void) {
@@ -661,23 +620,15 @@ static NSDictionary<NSString *, NSString *> *HideToggleMap(void) {
     dispatch_once(&onceToken, ^{
         map = @{
             // identifiers
-            @"id.video.share.button": @"hideShareButton_enabled", // Share button
-            @"id.ui.add_to.offline.button": @"hideDownloadButton_enabled",
-            @"id.video.remix.button": @"hideRemixButton_enabled",
-            @"clip_button.eml": @"hideClipButton_enabled",
-            @"id.ui.carousel_header": @"hideCommentSection_enabled",
-            @"id.video.like.button": @"hideLikeButton_enabled", // like button
-            @"id.video.dislike.button": @"hideDislikeButton_enabled", // unidentified identifier
-            @"Share": @"hideShareButton_enabled", // Share Button
-            @"Ask": @"hideAskButton_enabled", // unidentified identifier
-            @"Download": @"hideDownloadButton_enabled", // Download Button
-            @"Hype": @"hideHypeButton_enabled", // unidentified identifier
-            @"Thanks": @"hideThanksButton_enabled", // unidentified identifier
-            @"Remix": @"hideRemixButton_enabled", // Remix Button
-            @"Clip": @"hideClipButton_enabled", // Clip Button
-            @"id.video.add_to.button": @"hideSaveToPlaylistButton_enabled", // unidentified identifier
-            @"Report": @"hideReportButton_enabled", // unidentified identifier
-            @"connect account": @"hideConnectButton_enabled" // unidentified identifier
+            @"id.video.like.button": @"YouModHideLikeButton", // Like button
+            @"id.video.dislike.button": @"YouModHideDisLikeButton", // Dislike button
+            @"id.video.share.button": @"YouModHideShareButton", // Share button
+            @"id.ui.add_to.offline.button": @"YouModHideDownloadButton", // Download button
+            @"clip_button.eml": @"YouModHideClipButton", // Clip button
+            @"id.video.remix.button": @"YouModHideRemixButton", // Remix button
+            @"id.video.add_to.button": @"YouModHideSaveButton", // Save to playlist button
+            @"id.ui.carousel_header": @"YouModHideRemixButton" // Comment section - TEST
+            /*
             Extra keys
             id.reel_multi_format_link = Shorts -> full video
             id.reel_like_button
@@ -687,8 +638,7 @@ static NSDictionary<NSString *, NSString *> *HideToggleMap(void) {
             id.reel_remix_button
             id.reel_pivot_button Sound metadate in shorts
             id.ui.video_metadata_carousel -> Preview comments in full video
-            @"horizontal-video-shelf.eml": @"HideHoriShelf",
-            @"feed_nudge.view": @"HideGenMusicShelf"
+            */
         };
     });
     return map;
@@ -836,40 +786,5 @@ static void hideButtonsInActionBarIfNeeded(id collectionView) {
             NSLog(@"[HidePlayerButtons] relayout hide exception: %@", e);
         }
     });
-}
-%end
-*/
-
-// I ran out of ideas
-/*
-%hook _ASDisplayView
-
-- (void)didMoveToWindow {
-    %orig;
-    if (IS_ENABLED(HideHoriShelf) && [self.accessibilityIdentifier isEqualToString:@"horizontal-video-shelf.view"]) self.hidden = YES;
-	if (IS_ENABLED(HideGenMusicShelf) && [self.accessibilityIdentifier isEqualToString:@"feed_nudge.view"]) self.hidden = YES;
-}
-
-%end
-*/
-
-%hook _ASDisplayView
-- (void)didMoveToWindow {
-    %orig;
-    NSString *viewID = self.accessibilityIdentifier;
-    BOOL shouldHide = NO;
-    if (IS_ENABLED(HideHoriShelf) && [viewID isEqualToString:@"horizontal-video-shelf.view"]) shouldHide = YES;
-    if (IS_ENABLED(HideGenMusicShelf) && [viewID isEqualToString:@"feed_nudge.view"]) shouldHide = YES;
-    if (shouldHide) {
-        self.hidden = YES;
-        // Force the view and its superview (the cell) to zero height
-        CGRect frame = self.frame;
-        frame.size.height = 0;
-        self.frame = frame;
-        if (self.superview) {
-            self.superview.frame = frame;
-            self.superview.hidden = YES;
-        }
-    }
 }
 %end
