@@ -23,7 +23,7 @@
     if (IS_ENABLED(HideShortsMetaButton) && [self.accessibilityIdentifier isEqualToString:@"id.reel_pivot_button"]) self.hidden = YES;
     if (IS_ENABLED(HideShortsProducts) && [self.accessibilityIdentifier isEqualToString:@"product_sticker.main_target"]) self.hidden = YES;
     if (IS_ENABLED(HideShortsProducts) && [self.accessibilityIdentifier isEqualToString:@"product_sticker.secondary_target"]) self.hidden = YES;
-    if (IS_ENABLED(HideShortsRecbar) && [self.accessibilityIdentifier isEqualToString:@"id.elements.components.suggested_action.button"]) self.hidden = YES;
+    if (IS_ENABLED(HideShortsRecbar) && [self.accessibilityIdentifier isEqualToString:@"id.elements.components.suggested_action"]) self.hidden = YES;
     if (IS_ENABLED(HideShortsCommit) && [self.accessibilityIdentifier isEqualToString:@"eml.shorts-disclosures"]) self.hidden = YES;
     if (IS_ENABLED(HideShortsSubscriptButton) && [self.accessibilityIdentifier isEqualToString:@"id.ui.shorts_paused_state.subscriptions_button"]) self.hidden = YES;
     if (IS_ENABLED(HideShortsLiveButton) && [self.accessibilityIdentifier isEqualToString:@"id.ui.shorts_paused_state.live_button"]) self.hidden = YES;
@@ -405,15 +405,6 @@
 */
 
 /*
-// Forcibly Enable Miniplayer
-%hook YTWatchMiniBarViewController
-- (void)updateMiniBarPlayerStateFromRenderer {}
-%end
-
-%hook YTWatchFloatingMiniplayerViewController
-- (void)updateMiniBarPlayerStateFromRenderer {}
-%end
-
 // Portrait Fullscreen
 %hook YTWatchViewController
 - (unsigned long long)allowedFullScreenOrientations { return PortraitFullscreen() ? UIInterfaceOrientationMaskAllButUpsideDown; } // wth is this?
@@ -425,9 +416,11 @@
 // - (void)didMoveToWindow { %orig; if (ytlBool(@"dontSnapToChapter")) self.enableSnapToChapter = NO; }
 // %end
 
+/*
 %hook YTModularPlayerBarController
 - (void)setEnableSnapToChapter:(BOOL)arg { %orig(NO); } // idk this works or not
 %end
+*/
 
 %hook YTPlayerViewController
 - (void)loadWithPlayerTransition:(id)arg1 playbackConfig:(id)arg2 {
