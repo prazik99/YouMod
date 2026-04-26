@@ -175,6 +175,9 @@ jobs:
       - name: Clone youtube-native-share
         run: git clone --quiet --depth=1 https://github.com/jkhsjdhjs/youtube-native-share.git
 
+      - name: Clone iSponsorBlock
+        run: git clone --quiet --depth=1 https://github.com/Galactic-Dev/iSponsorBlock.git
+
       - name: Clone YTVideoErrorAlert
         if: ${{ inputs.ytvid }}
         run: git clone --quiet --depth=1 https://github.com/PoomSmart/YTVideoErrorAlert.git
@@ -299,6 +302,12 @@ jobs:
           cd YouGetCaption
           make clean package DEBUG=0 FINALPACKAGE=1 THEOS_PACKAGE_SCHEME=rootless
           mv packages/*.deb ${{ github.workspace }}/ygc.deb
+
+      - name: Build iSponsorBlock
+        run: |
+          cd iSponsorBlock
+          make clean package DEBUG=0 FINALPACKAGE=1 THEOS_PACKAGE_SCHEME=rootless TARGET=iphone:clang:latest:13.0
+          mv packages/*.deb ${{ github.workspace }}/isponsorblock.deb
 
       - name: Build youtube-native-share
         run: |
