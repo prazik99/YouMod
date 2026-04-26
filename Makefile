@@ -9,6 +9,6 @@ include $(THEOS)/makefiles/common.mk
 TWEAK_NAME = YouMod
 $(TWEAK_NAME)_FRAMEWORKS = UIKit Foundation
 $(TWEAK_NAME)_CFLAGS = -fobjc-arc
-$(TWEAK_NAME)_FILES = Tweak.x Settings.x YouModPerferences.m
+$(TWEAK_NAME)_FILES = $(wildcard *.x *.m)
 
 include $(THEOS_MAKE_PATH)/tweak.mk
