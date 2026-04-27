@@ -192,13 +192,13 @@ static BOOL isDarkMode(UIView *view) {
     }
     return %orig;
 }
+/* Disabled due to some bugs
 - (UIColor *)background1 {
     if (IS_ENABLED(OLEDTheme) && isDarkMode2) {
         return [UIColor blackColor];
     }
     return %orig;
 }
-/* Disabled due to some bugs
 - (UIColor *)background2 {
     if (IS_ENABLED(OLEDTheme) && isDarkMode2) {
         return [UIColor blackColor];
